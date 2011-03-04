@@ -18,7 +18,7 @@ template = Template(*cfg.TEMPLATES, engines={'mint': mint.TemplateEngine})
 static = web.static_files(cfg.STATIC)
 memcached = memcache.Client(cfg.MEMCACHE)
 auth = CookieAuth(User.by_credential, User.by_id, 
-                  memcached, cookie_name='di-auth')
+                  memcached, cookie_name='utask-auth')
 
 
 def redirect_to(*args, **kwargs):
