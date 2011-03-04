@@ -7,6 +7,9 @@ from insanities.templates import Template, mint
 from insanities.ext.auth import CookieAuth
 
 import cfg
+import issue
+import project
+import views
 from models import User
 
 session_maker = sqla.construct_maker(cfg.DATABASES, 
@@ -52,8 +55,27 @@ def config(env, data, next_handler):
 
 app = web.handler(config) | web.cases(
     static,
-    web.match('/', 'index') | (lambda e,d,n: web.Response('hello'))
-)
+    auth | web.cases(
+        web.match('/', 'dashboard') | views.dashboard,
+
+        web.prefix('/issue') | web.cases(
+            web.match('', 'create-issue') | issue.create,
+            web.match('/<int:issue>', 'issue') | issue.get | web.cases(
+                web.method('get'),
+                web.method('post') | issue.update,
+                ) | template.render_to('issue'),
+            ),
+
+        web.prefix('/proj') | web.cases(
+            web.match('', 'create-project') | project.create,
+            web.match('/<int:proj>', 'project') | project.get | web.cases(
+                web.method('get'),
+                web.method('post') | project.update,
+                ) | template.render_to('proj'),
+            ),
+
+        )
+    )
 
 
 url_for = web.Reverse.from_handler(app)

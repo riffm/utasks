@@ -9,13 +9,15 @@ for p in ('../third-party', '..'):
 
 import cfg
 import mage
+import app
 from mage import sqla
-from app import app
 
 
 if __name__ == '__main__':
     mage.manage(dict(
-        app=mage.application(app.as_wsgi()),
+        app=mage.application(app.app.as_wsgi(), namespace=dict(
+                            db=app.session_maker(),
+                        )),
         db=sqla.Commands(cfg.DATABASES, 
                          engine_params=cfg.DATABASE_PARAMS),
     ), sys.argv)

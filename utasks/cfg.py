@@ -19,12 +19,12 @@ STATIC = rel('static')
 
 
 DATABASES = {
-    '':'sqlite:///:memory:',
+    '':'sqlite:///data.db',
 }
 
 
 DATABASE_PARAMS = {
-    'pool_size': 10,
+    'pool_size':6,
     'echo':True,
 }
 
