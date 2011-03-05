@@ -59,7 +59,6 @@ app = web.handler(config) | web.cases(
         web.match('/', 'dashboard') | views.dashboard,
 
         web.prefix('/issue') | web.cases(
-            web.match('', 'create-issue') | issue.create,
             web.match('/<int:issue>', 'issue') | issue.get | web.cases(
                 web.method('get'),
                 web.method('post') | issue.update,
@@ -68,10 +67,13 @@ app = web.handler(config) | web.cases(
 
         web.prefix('/proj') | web.cases(
             web.match('', 'create-project') | project.create,
-            web.match('/<int:proj>', 'project') | project.get | web.cases(
-                web.method('get'),
-                web.method('post') | project.update,
-                ) | template.render_to('proj'),
+            web.prefix('/<int:proj>') | project.get | web.cases(
+                web.match('', 'project') | web.cases(
+                    web.method('get'),
+                    web.method('post') | project.update,
+                    ) | template.render_to('proj'),
+                web.match('/issue', 'create-issue') | issue.create,
+                )
             ),
 
         )

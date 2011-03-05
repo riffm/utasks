@@ -68,7 +68,7 @@ class Issue(MapedObject):
     id = Column(Integer, primary_key=True)
     title = Column(String(500), nullable=False)
     proj_id = Column(Integer, ForeignKey(Project.id), nullable=False)
-    proj = relation(Project)
+    proj = relation(Project, backref='issues')
     state = Column(Integer, nullable=False, default=OPEN)
 
 
@@ -76,6 +76,6 @@ class Comment(MapedObject):
     __tablename__ = 'comment'
     id = Column(Integer, primary_key=True)
     issue_id = Column(Integer, ForeignKey(Issue.id), nullable=False)
-    issue = relation(Issue)
+    issue = relation(Issue, backref='comments')
     raw = Column(String(1000), nullable=False)
     html = Column(String(1000), nullable=False)
