@@ -9,6 +9,7 @@ from insanities.ext.auth import CookieAuth
 import cfg
 import issue
 import project
+import user
 import views
 from models import User
 
@@ -75,6 +76,14 @@ app = web.handler(config) | web.cases(
                 web.match('/issue', 'create-issue') | issue.create,
                 )
             ),
+
+        web.prefix('/user') | web.cases(
+            web.match('', 'create-user') | user.create,
+            web.match('/<int:user_id>', 'user') | user.get | web.cases(
+                web.method('get'),
+                web.method('post') | user.update,
+                ) | template.render_to('user'),
+            )
 
         )
     )
