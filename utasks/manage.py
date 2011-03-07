@@ -11,6 +11,7 @@ import cfg
 import mage
 import app
 from mage import sqla
+from initial import initial
 
 
 if __name__ == '__main__':
@@ -19,5 +20,6 @@ if __name__ == '__main__':
                             db=app.session_maker(),
                         )),
         db=sqla.Commands(cfg.DATABASES, 
+                         initial=initial,
                          engine_params=cfg.DATABASE_PARAMS),
     ), sys.argv)

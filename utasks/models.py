@@ -27,6 +27,9 @@ class User(MapedObject):
     def __unicode__(self):
         return u'%s (%s)' % (self.name, self.login)
 
+    def __repr__(self):
+        return self.email.encode('utf-8')
+
     def set_password(self, password):
         self.password = encrypt_password(password)
 

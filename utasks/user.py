@@ -33,7 +33,9 @@ def create(env, data, nxt):
     db = env.db
     if env.request.method == 'POST':
         if form.accept(env.request.POST):
+            password = form.python_data.pop('password')
             user = User(**form.python_data)
+            user.set_password(password)
             db.add(user)
             db.commit()
             return env.redirect_to('user', user_id=user.id)
