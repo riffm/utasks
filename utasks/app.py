@@ -54,41 +54,38 @@ def config(env, data, next_handler):
         env.db.close()
 
 
-login_required = auth.login_required
-render_to = template.render_to
-
-
 app = web.handler(config) | web.cases(
     static,
-    auth.login_handler | render_to('login'),
+    auth.login_handler | template.render_to('login'),
     auth.logout_handler,
+
     auth | web.cases(
         web.match('/', 'dashboard') | views.dashboard,
 
         web.prefix('/issue') | web.cases(
             web.match('/<int:issue>', 'issue') | issue.get | web.cases(
                 web.method('get'),
-                web.method('post') | login_required | issue.update,
-                ) | render_to('issue'),
+                web.method('post') | auth.login_required | issue.update,
+                ) | template.render_to('issue'),
             ),
 
         web.prefix('/proj') | web.cases(
-            web.match('', 'create-project') | login_required | project.create,
+            web.match('', 'create-project') | auth.login_required | project.create,
             web.prefix('/<int:proj>') | project.get | web.cases(
                 web.match('', 'project') | web.cases(
                     web.method('get'),
                     web.method('post') | project.update,
-                    ) | render_to('proj'),
+                    ) | template.render_to('proj'),
                 web.match('/issue', 'create-issue') | issue.create,
                 )
             ),
 
         web.prefix('/user') | web.cases(
-            web.match('', 'create-user') | login_required | user.create,
+            web.match('', 'create-user') | auth.login_required | user.create,
             web.match('/<int:user_id>', 'user') | user.get | web.cases(
                 web.method('get'),
-                web.method('post') | login_required | user.update,
-                ) | render_to('user'),
+                web.method('post') | auth.login_required | user.update,
+                ) | template.render_to('user'),
             )
 
         )

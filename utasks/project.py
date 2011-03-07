@@ -7,8 +7,10 @@ from models import Project
 
 class ProjectForm(Form):
     fields = [
-        Field('name', convs.Char()),
-        Field('description', convs.Char(required=False)),
+        Field('name', convs.Char(), label=u'Название'),
+        Field('description', convs.Char(required=False), 
+              label=u'Описание',
+              widget=widgets.Textarea),
     ]
 
 
