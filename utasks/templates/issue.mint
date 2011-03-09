@@ -5,12 +5,19 @@
 
     @p Данная задача — {{ u'закрыта' if issue.done else u'открыта' }}.
 
-    #if issue.author.id != issue.executor.id:
-        @p
+    @p
+        #if issue.author.id != issue.executor.id:
             Некто {{ issue.author.name }} хочет попросить
             {{ u'вас' if issue.executor.id == env.user.id else issue.executor.name }}
-    #else:
-        @p Вы хотите от себя следующее
+        #elif env.user and issue.author.id == env.user.id:
+            Данную задачу, Вы назначили себе сами.
+        #else:
+            Данную задачу, назначил себе {{ issue.author.name }}.
+
+        #if issue.deadline:
+            Срок — {{ issue.deadline.strftime('%d/%m/%Y') }}
+        #else:
+            Сроков нет.
 
     @h1 {{ issue.title }}
 

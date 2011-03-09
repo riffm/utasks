@@ -9,6 +9,7 @@ from utils import ModelChoice
 class IssueForm(Form):
     fields = [
         Field('issue', convs.Char(), widget=widgets.Textarea),
+        Field('deadline', convs.Date(format='%d/%m/%Y', required=False), label=u'срок'),
         Field('executor', ModelChoice(model=User, 
                                       get_object_label=lambda o: o.name), 
               widget=widgets.Select),
@@ -37,12 +38,14 @@ def create(env, data, nxt):
     db = env.db
     if env.request.method == 'POST':
         if form.accept(env.request.POST):
+            deadline = form.python_data['deadline']
             text = form.python_data['issue']
             title, body = text, ''
             chunks = text.split('\r\n\r\n', 1)
             if len(chunks) > 1:
                 title, body = chunks
-            issue = Issue(title=title, proj=data.project, author=env.user)
+            issue = Issue(title=title, proj=data.project, 
+                          author=env.user, deadline=deadline)
             issue.executor = form.python_data['executor']
             db.add(issue)
             if body:
