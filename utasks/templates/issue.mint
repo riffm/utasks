@@ -8,7 +8,7 @@
     @p
         #if issue.author.id != issue.executor.id:
             Некто {{ issue.author.name }} хочет попросить
-            {{ u'вас' if issue.executor.id == env.user.id else issue.executor.name }}
+            {{ u'вас' if env.user and issue.executor.id == env.user.id else issue.executor.name }}
         #elif env.user and issue.author.id == env.user.id:
             Данную задачу, Вы назначили себе сами.
         #else:
