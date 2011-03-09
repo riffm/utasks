@@ -13,12 +13,20 @@ class UserForm(Form):
         Field('name', convs.Char(required=False), label=u'Имя'),
         Field('login', convs.Char(), label=u'login'),
         Field('email', convs.Char(), label=u'email'),
-        PasswordSet(label=u'пароль'),
+        PasswordSet(label=u'пароль', required=False),
         Field('projects', ModelChoice(model=Project,
                                       multiple=True,
                                       get_object_label=lambda o: o.name),
               widget=widgets.Select),
     ]
+
+
+def user_form(env):
+    initial = {}
+    if env.user:
+        for field in UserForm.fields:
+            initial[field.name] = getattr(env.user, field.name, None)
+    return UserForm(env, initial=initial)
 
 
 def get(env, data, nxt):
@@ -27,6 +35,9 @@ def get(env, data, nxt):
         data.user = user
         data.issues = env.db.query(Issue).filter(or_(Issue.author==user, 
                                                  Issue.executor==user))
+        data.form = None
+        if env.user.id == user.id:
+            data.form = user_form(env)
         return nxt(env, data)
     return web.Response(status=404)
 
@@ -47,4 +58,14 @@ def create(env, data, nxt):
 
 
 def update(env, data, nxt):
+    data.form = form = user_form(env)
+    user = env.user
+    if form.accept(env.request.POST):
+        password = form.python_data.pop('password')
+        for k, v in form.python_data.items():
+            setattr(user, k, v)
+        if password:
+            user.set_password(password)
+        env.db.commit()
+        return env.redirect_to('user', user_id=user.id)
     return nxt(env, data)
