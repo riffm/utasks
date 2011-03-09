@@ -27,6 +27,7 @@ def create(env, data, nxt):
     if env.request.method == 'POST':
         if form.accept(env.request.POST):
             proj = Project(**form.python_data)
+            env.user.projects = env.user.projects + [proj]
             env.db.add(proj)
             env.db.commit()
             return env.redirect_to('project', proj=proj.id)
