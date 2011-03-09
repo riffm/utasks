@@ -2,12 +2,16 @@
 
 from insanities import web
 from insanities.forms import *
-from models import Issue, Project, Comment
+from models import Issue, Project, Comment, User
+from utils import ModelChoice
 
 
 class IssueForm(Form):
     fields = [
         Field('issue', convs.Char(), widget=widgets.Textarea),
+        Field('executor', ModelChoice(model=User, 
+                                      get_object_label=lambda o: o.name), 
+              widget=widgets.Select),
     ]
 
 
@@ -29,7 +33,8 @@ def create(env, data, nxt):
             chunks = text.split('\r\n\r\n', 1)
             if len(chunks) > 1:
                 title, body = chunks
-            issue = Issue(title=title, proj=data.project)
+            issue = Issue(title=title, proj=data.project, author=env.user)
+            issue.executor = form.python_data['executor']
             db.add(issue)
             if body:
                 comment = Comment(issue=issue, raw=body, html=body)

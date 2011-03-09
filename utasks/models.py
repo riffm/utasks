@@ -73,6 +73,10 @@ class Issue(MapedObject):
     proj_id = Column(Integer, ForeignKey(Project.id), nullable=False)
     proj = relation(Project, backref='issues')
     state = Column(Integer, nullable=False, default=OPEN)
+    author_id = Column(Integer, ForeignKey(User.id), nullable=False)
+    author = relation(User, primaryjoin=User.id==author_id)
+    executor_id = Column(Integer, ForeignKey(User.id), nullable=False)
+    executor = relation(User, primaryjoin=User.id==executor_id)
 
 
 class Comment(MapedObject):
