@@ -2,6 +2,8 @@
 
 #def body():
     @h1 {{ project.name }}
+        #if env.user in project.users:
+            @a.href({{ env.url_for('update-project', proj=project.id) }}) редактировать
     #if project.description:
         @p.class(description) {{ project.description }}
 

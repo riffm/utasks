@@ -72,10 +72,8 @@ app = web.handler(config) | web.cases(
         web.prefix('/proj') | web.cases(
             web.match('', 'create-project') | auth.login_required | project.create,
             web.prefix('/<int:proj>') | project.get | web.cases(
-                web.match('', 'project') | web.cases(
-                    web.method('get'),
-                    web.method('post') | project.update,
-                    ) | template.render_to('proj'),
+                web.match('', 'project') | template.render_to('proj'),
+                web.match('/update', 'update-project') | project.update,
                 web.match('/issue', 'create-issue') | issue.create,
                 )
             ),
