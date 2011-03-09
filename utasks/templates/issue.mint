@@ -3,6 +3,8 @@
 #def body():
     @div @a.href({{ env.url_for('project', proj=issue.proj.id) }}) {{ issue.proj.name }}
 
+    @p Данная задача — {{ form.states[issue.state][1] }}.
+
     #if issue.author.id != issue.executor.id:
         @p
             Некто {{ issue.author.name }} хочет попросить
@@ -14,10 +16,12 @@
 
     #for comment, l in utils.loop(issue.comments):
         #if not l.first:
-            @p @i {{ comment.author.name }}
+            @p @a.href({{ env.url_for('user', user_id=comment.author.id) }}) @i {{ comment.author.name }}
         @p {{ comment.html }}
 
     #if env.user:
         @form.action({{ env.url_for('issue', issue=issue.id) }}).method(POST)
             {{ form.render() }}
             @input.type(submit).value(Комментировать)
+            #if env.user.id == issue.author.id and issue.state != issue.CLOSED:
+                @button.name(comment_and_close).value(1) Комментировать и закрыть

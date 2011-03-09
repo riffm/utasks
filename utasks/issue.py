@@ -27,6 +27,8 @@ class CommentForm(Form):
         Field('comment', convs.Char(), widget=widgets.Textarea),
         Field('state', convs.EnumChoice(choices=states, conv=convs.Int()), 
               widget=widgets.HiddenInput),
+        Field('comment_and_close', convs.Bool(), default=False, 
+              widget=widgets.HiddenInput),
     ]
 
 
@@ -63,13 +65,13 @@ def create(env, data, nxt):
 
 def update(env, data, nxt):
     issue = data.issue
-    data.form = form = CommentForm(env, initial=dict(state=issue.state))
+    data.form = form = CommentForm(env)
     if form.accept(env.request.POST):
         db = env.db
         text = form.python_data['comment']
-        state = form.python_data['state']
-        issue.state = state
         comment = Comment(raw=text, html=text, issue=issue, author=env.user)
+        if form.python_data['comment_and_close']:
+            issue.state = Issue.CLOSED
         db.add(comment)
         db.commit()
         return env.redirect_to('issue', issue=issue.id)
