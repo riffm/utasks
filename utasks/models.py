@@ -86,3 +86,5 @@ class Comment(MapedObject):
     issue = relation(Issue, backref='comments')
     raw = Column(String(1000), nullable=False)
     html = Column(String(1000), nullable=False)
+    author_id = Column(Integer, ForeignKey(User.id), nullable=False)
+    author = relation(User)
