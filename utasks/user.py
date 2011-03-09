@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from sqlalchemy.sql.expression import or_
 from insanities import web
 from insanities.forms import *
 from models import Issue, Project, Comment, User
@@ -24,6 +25,8 @@ def get(env, data, nxt):
     user = env.db.get(User, id=data.user_id)
     if user:
         data.user = user
+        data.issues = env.db.query(Issue).filter(or_(Issue.author==user, 
+                                                 Issue.executor==user))
         return nxt(env, data)
     return web.Response(status=404)
 
