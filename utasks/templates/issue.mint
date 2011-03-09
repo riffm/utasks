@@ -3,7 +3,7 @@
 #def body():
     @div @a.href({{ env.url_for('project', proj=issue.proj.id) }}) {{ issue.proj.name }}
 
-    @p Данная задача — {{ form.states[issue.state][1] }}.
+    @p Данная задача — {{ u'закрыта' if issue.done else u'открыта' }}.
 
     #if issue.author.id != issue.executor.id:
         @p
@@ -23,5 +23,5 @@
         @form.action({{ env.url_for('issue', issue=issue.id) }}).method(POST)
             {{ form.render() }}
             @input.type(submit).value(Комментировать)
-            #if env.user.id == issue.author.id and issue.state != issue.CLOSED:
+            #if env.user.id in (issue.author.id, issue.executor.id) and not issue.done:
                 @button.name(comment_and_close).value(1) Комментировать и закрыть

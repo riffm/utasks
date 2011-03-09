@@ -16,17 +16,8 @@ class IssueForm(Form):
 
 
 class CommentForm(Form):
-    states = (
-        (Issue.OPEN, u'новая'),
-        (Issue.DONE, u'сделана'),
-        (Issue.CLOSED, u'закрыта'),
-        (Issue.REOPEN, u'открыта заново'),
-    )
-
     fields = [
         Field('comment', convs.Char(), widget=widgets.Textarea),
-        Field('state', convs.EnumChoice(choices=states, conv=convs.Int()), 
-              widget=widgets.HiddenInput),
         Field('comment_and_close', convs.Bool(), default=False, 
               widget=widgets.HiddenInput),
     ]
@@ -36,7 +27,7 @@ def get(env, data, nxt):
     issue = env.db.get(Issue, id=data.issue)
     if issue:
         data.issue = issue
-        data.form = CommentForm(env, initial={'state':issue.state})
+        data.form = CommentForm(env)
         return nxt(env, data)
     return web.Response(status=404)
 
@@ -71,7 +62,7 @@ def update(env, data, nxt):
         text = form.python_data['comment']
         comment = Comment(raw=text, html=text, issue=issue, author=env.user)
         if form.python_data['comment_and_close']:
-            issue.state = Issue.CLOSED
+            issue.done = True
         db.add(comment)
         db.commit()
         return env.redirect_to('issue', issue=issue.id)

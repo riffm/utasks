@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
+from datetime import datetime
 from sqlalchemy import Column, Integer, String, ForeignKey, Table
+from sqlalchemy import Boolean, DateTime, Date
 from sqlalchemy import Table, UniqueConstraint
 from sqlalchemy.orm import relation
 from sqlalchemy.schema import MetaData
@@ -12,7 +14,6 @@ from insanities.ext.auth import encrypt_password, check_password
 metadata = MetaData()
 
 MapedObject = declarative_base(metadata=metadata, name='MapedObject')
-
 
 
 class User(MapedObject):
@@ -64,15 +65,13 @@ users_projects = Table('users_projects', metadata,
 
 class Issue(MapedObject):
     __tablename__ = 'issue'
-    OPEN = 0
-    DONE = 1
-    CLOSED = 2
-    REOPEN = 3
     id = Column(Integer, primary_key=True)
+    done = Column(Boolean, nullable=False, default=False)
+    created = Column(DateTime, nullable=False, default=datetime.now)
+    deadline = Column(Date)
     title = Column(String(500), nullable=False)
     proj_id = Column(Integer, ForeignKey(Project.id), nullable=False)
     proj = relation(Project, backref='issues')
-    state = Column(Integer, nullable=False, default=OPEN)
     author_id = Column(Integer, ForeignKey(User.id), nullable=False)
     author = relation(User, primaryjoin=User.id==author_id)
     executor_id = Column(Integer, ForeignKey(User.id), nullable=False)
